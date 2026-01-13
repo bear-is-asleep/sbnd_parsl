@@ -49,6 +49,7 @@ nvidia-smi --query-gpu=pci.bus_id,name,utilization.gpu,memory.used,memory.total 
     }' | paste -sd,
 echo "}"
 
+<<<<<<< HEAD
 # Number of file descriptors (total across all user processes)
 PIDS=$(ps aux | grep bearc | grep -v grep | awk '{print $2}')
 
@@ -63,3 +64,6 @@ done
 echo ",\"total_file_descriptors\": $TOT_FD"
 
 echo "}}"
+=======
+echo "}}"
+>>>>>>> 1111706d76525a2a3507f05b3be05609ca1eb104
