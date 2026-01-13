@@ -24,6 +24,7 @@ def main():
     cpu_data = {}
     gpu_data = {}
     mem_data = {}
+    fd_data = {}
 
     for i, ts_record in enumerate(json_log.items()):
         ts, record = ts_record
@@ -33,7 +34,7 @@ def main():
         cpu_info_list = record['sysstat']['hosts'][0]['statistics'][0]['cpu-load']
         gpu_info = record['gpu']
         mem_info = record['mem']
-
+        fd_info = record['total_file_descriptors']
         times.append(timestamp)
 
         for _, info in PID.items():
@@ -60,13 +61,19 @@ def main():
             if key not in mem_data:
                 mem_data[key] = np.zeros(nrecords)
             mem_data[key][i] = val
+        
+        if fd_info not in fd_data:
+            fd_data[fd_info] = np.zeros(nrecords)
+        fd_data[fd_info][i] = fd_info
 
     # Create subplots with 4 rows
-    fig = make_subplots(rows=4, cols=1, 
+    fig = make_subplots(rows=5, cols=1, 
                         subplot_titles=("Number of Processes", 
                                         "Per-core CPU Usage (A.U.)", 
                                         "GPU Usage (%)", 
-                                        "Memory Usage (GB)"),
+                                        "Memory Usage (GB)",
+                                        "Total File Descriptors"),
+
                         shared_xaxes=True,
                         vertical_spacing=0.1)
 
@@ -116,6 +123,15 @@ def main():
         row=4, col=1
     )
     fig.update_yaxes(range=[0, max_mem * 1.1], row=4, col=1)
+
+    # Plot 5: Total File Descriptors
+    # Convert fd_data to a list for plotting
+    fd_values = list(fd_data.values())[0]  # Get the first (and only) array of values
+    fig.add_trace(
+        go.Scatter(x=times, y=fd_values, name="Total File Descriptors", mode="lines"),
+        row=5, col=1
+    )
+    fig.update_yaxes(range=[0, max(fd_values) * 1.1], row=5, col=1)
 
     # Update layout
     fig.update_layout(

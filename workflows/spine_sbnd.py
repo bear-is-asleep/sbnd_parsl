@@ -80,7 +80,11 @@ class SpineExecutor(WorkflowExecutor):
 
     def execute(self):
         """Override to create workflows from N files instead of iteration number."""
-        spine_input_generator = self.larcv_path.rglob('larcv*.root')
+        if self.larcv_path.is_dir():
+            spine_input_generator = self.larcv_path.rglob('larcv*.root')
+        else:
+            spine_input_generator = [self.larcv_path]
+        print(spine_input_generator)
         nsubruns = self.run_opts['nsubruns']
 
         idx_cycle = itertools.cycle(range(nsubruns))
